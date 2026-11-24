@@ -1,0 +1,6 @@
+{% extends "web/base.html" %}{% block title %}Move in tenant{% endblock %}
+{% block content %}<div class="crumbs"><a href="{% url 'tenants_list' %}">Tenants</a> / Move in</div><div class="pagehead"><div><h1>Move in a tenant</h1><p>Creates the tenant and tenancy, and bills the first month right away.</p></div></div>
+<form method="post" class="card formcard"><div class="body">{% csrf_token %}{% if form.non_field_errors %}<div class="formerrors">{{ form.non_field_errors }}</div>{% endif %}
+<div class="formgrid">{% for field in form %}{% include "web/partials/field.html" %}{% endfor %}</div>
+<button class="btn primary" type="submit" data-busy-text="Moving in…">Move in</button> <a class="btn" href="{% url 'tenants_list' %}">Cancel</a></div></form>
+{{ unit_defaults|json_script:"unit-defaults" }}{% endblock %}

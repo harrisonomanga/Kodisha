@@ -1,0 +1,8 @@
+{% extends "web/base.html" %}{% block title %}Tenants{% endblock %}
+{% block content %}<div class="pagehead"><div><h1>Tenants</h1></div>{% if can_write %}<a class="btn primary" href="{% url 'move_in' %}">Move in tenant</a>{% endif %}</div>
+<div class="card flush"><form class="toolbar" method="get"><input class="input" name="q" value="{{ q }}" placeholder="Name, phone or unit" aria-label="Search tenants">
+<div class="chips"><a href="?status=active" class="{% if status == 'active' %}on{% endif %}">Current</a><a href="?status=ended" class="{% if status == 'ended' %}on{% endif %}">Moved out</a><a href="?status=all" class="{% if status == 'all' %}on{% endif %}">All</a></div><input type="hidden" name="status" value="{{ status }}"><button class="btn sm" type="submit">Search</button></form>
+{% if page.object_list %}<div class="tablewrap"><table><thead><tr><th>Tenant</th><th>Unit</th><th>Phone</th><th class="num">Rent</th><th class="num">Owing</th></tr></thead><tbody>
+{% for l in page.object_list %}<tr><td><a href="{% url 'lease_detail' l.pk %}"><b>{{ l.tenant.full_name }}</b></a>{% if l.status == 'ended' %} <span class="pill muted">Moved out</span>{% endif %}</td><td>{{ l.unit.property.name }} · {{ l.unit.identifier }}</td><td>{{ l.tenant.phone }}</td><td class="num">{{ l.rent_minor|kes }}</td>
+<td class="num">{% if l.owing %}<b style="color:var(--bad)">{{ l.owing|kes }}</b>{% elif l.credit %}<span style="color:var(--ok)">{{ l.credit|kes }} credit</span>{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% include "web/partials/pager.html" %}
+{% else %}<div class="empty"><h3>No tenants found</h3><p>{% if q %}Try a different search.{% else %}Move in your first tenant to start billing.{% endif %}</p></div>{% endif %}</div>{% endblock %}

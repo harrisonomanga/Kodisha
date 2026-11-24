@@ -1,0 +1,31 @@
+{% extends "web/base.html" %}{% block title %}Rent board{% endblock %}
+{% block content %}
+<div class="pagehead"><div><h1>Rent board</h1><p>{{ period|date:"F Y" }} · {{ org.name }}</p></div>
+<div class="actions">{% if can_write %}<a class="btn primary" href="{% url 'payment_new' %}">Record payment</a><a class="btn" href="{% url 'move_in' %}">Move in tenant</a>{% endif %}
+{% if can_write and can_review %}<form method="post" action="{% url 'invoices_generate' %}">{% csrf_token %}<input type="hidden" name="next" value="/"><button class="btn" type="submit" data-busy-text="Creating…">Create this month's invoices</button></form>{% endif %}</div></div>
+{% if not has_properties %}
+<div class="card empty"><h3>Welcome. Let's add your first property.</h3><p>Add a property and its units. Each unit gets its own payment account number that tenants use on M-Pesa.</p>{% if can_write %}<a class="btn primary" href="{% url 'properties_new' %}">Add property</a>{% endif %}</div>
+{% else %}
+<div class="grid g4" style="margin-bottom:20px">
+ <div class="stat"><div class="l">Collected this month</div><div class="v">{{ paid_on_billed|kes }}</div><div class="s">of {{ billed|kes }} billed</div><div class="bar"><b style="width:{{ pct }}%"></b></div></div>
+ <div class="stat"><div class="l">Collection rate</div><div class="v">{{ pct }}%</div><div class="s">{{ counts.paid }} unit{{ counts.paid|pluralize }} fully paid</div></div>
+ <div class="stat"><div class="l">Overdue</div><div class="v" style="color:{% if overdue_total %}var(--bad){% endif %}">{{ overdue_total|kes }}</div><div class="s">{{ overdue_count }} tenant{{ overdue_count|pluralize }}</div></div>
+ <div class="stat"><div class="l">Vacant units</div><div class="v">{{ counts.vacant }}</div><div class="s">{% if review_count %}<a href="{% url 'review_list' %}">{{ review_count }} payment{{ review_count|pluralize }} need review</a>{% else %}No payments waiting{% endif %}</div></div>
+</div>
+<div class="split"><div>
+{% for b in boards %}<section class="card"><header><div><h2><a href="{% url 'property_detail' b.property.pk %}">{{ b.property.name }}</a></h2><span class="muted small">{{ b.paid }} of {{ b.occupied }} occupied units paid</span></div></header>
+<div class="tiles">{% for t in b.tiles %}
+{% if t.lease %}<a class="tile {{ t.state }}" href="{% url 'lease_detail' t.lease.pk %}"><b>{{ t.unit.identifier }}</b><span>{{ t.lease.tenant.full_name }}</span><em>{% if t.owing %}{{ t.owing|kes }}{% else %}{{ t.state|tile_label }}{% endif %}</em></a>
+{% else %}<a class="tile vacant" href="{% if can_write %}{% url 'move_in' %}?unit={{ t.unit.pk }}{% else %}{% url 'property_detail' b.property.pk %}{% endif %}"><b>{{ t.unit.identifier }}</b><span>No tenant</span><em>Vacant</em></a>{% endif %}{% endfor %}</div></section>{% endfor %}
+<div class="legend"><span><i style="background:var(--ok)"></i>Paid</span><span><i style="background:var(--warn)"></i>Part paid</span><span><i style="background:var(--info)"></i>Awaiting</span><span><i style="background:var(--bad)"></i>Overdue</span><span><i style="background:var(--line2)"></i>Not billed</span></div>
+</div><div>
+<section class="card"><header><h2>Billed vs collected</h2></header>
+<div class="chart" role="img" aria-label="Last six months, billed and collected">{% for h in history %}<div><div class="cols"><i style="height:{{ h.billed_h }}%;background:var(--line2)" title="Billed {{ h.billed|kes }}"></i><i style="height:{{ h.paid_h }}%;background:var(--brand)" title="Collected {{ h.paid|kes }}"></i></div><span>{{ h.period|date:"M" }}</span></div>{% endfor %}</div>
+<div class="legend" style="padding:10px 18px 14px"><span><i style="background:var(--line2)"></i>Billed</span><span><i style="background:var(--brand)"></i>Collected</span></div></section>
+<section class="card flush"><header><h2>Biggest arrears</h2><a class="small" href="{% url 'report_arrears' %}">All</a></header>
+{% for r in top_arrears %}<div class="toolbar" style="justify-content:space-between"><span><a href="{% url 'lease_detail' r.lease_id %}">{{ r.tenant }}</a><br><span class="muted small">{{ r.property }} · {{ r.unit }}</span></span><b class="num" style="color:var(--bad)">{{ r.overdue|kes }}</b></div>
+{% empty %}<div class="empty" style="padding:24px">Nobody is behind on rent.</div>{% endfor %}</section>
+<section class="card flush"><header><h2>Recent payments</h2><a class="small" href="{% url 'payments_list' %}">All</a></header>
+{% for p in recent %}<a class="toolbar" style="justify-content:space-between;color:inherit" href="{% url 'payment_detail' p.pk %}"><span>{{ p.lease.tenant.full_name|default:"Unassigned" }}<br><span class="muted small">{{ p.channel|channel_label }} · {{ p.paid_at|date:"j M, H:i" }}</span></span><b class="num">{{ p.amount_minor|kes }}</b></a>
+{% empty %}<div class="empty" style="padding:24px">No payments yet.</div>{% endfor %}</section>
+</div></div>{% endif %}{% endblock %}

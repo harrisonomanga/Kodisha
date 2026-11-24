@@ -1,0 +1,9 @@
+{% load static %}<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in · {{ product_name }}</title>
+<link rel="stylesheet" href="{% static 'web/app.css' %}"></head><body>
+<div class="login"><div class="card"><div class="brand" style="color:var(--ink);padding:0 0 6px"><i>K</i>{{ product_name }}</div>
+<p class="muted" style="margin:0 0 20px">Rent collection and reconciliation, made simple.</p>
+<form method="post">{% csrf_token %}
+{% if form.non_field_errors %}<div class="formerrors" role="alert">Wrong username or password. Please try again.</div>{% endif %}
+{% for field in form %}{% include "web/partials/field.html" %}{% endfor %}
+<input type="hidden" name="next" value="{{ next }}">
+<button class="btn primary" style="width:100%;justify-content:center" type="submit">Sign in</button></form></div></div></body></html>

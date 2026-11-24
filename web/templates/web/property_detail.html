@@ -1,0 +1,11 @@
+{% extends "web/base.html" %}{% block title %}{{ prop.name }}{% endblock %}
+{% block content %}<div class="crumbs"><a href="{% url 'properties_list' %}">Properties</a> / {{ prop.name }}</div>
+<div class="pagehead"><div><h1>{{ prop.name }}</h1><p>{{ prop.code }}{% if prop.location %} · {{ prop.location }}{% endif %} · Landlord: {{ prop.landlord.name|default:"—" }}</p></div>
+{% if can_write %}<div class="actions"><a class="btn primary" href="{% url 'unit_new' prop.pk %}">Add unit</a></div>{% endif %}</div>
+<div class="grid g3" style="margin-bottom:20px"><div class="stat"><div class="l">Units</div><div class="v">{{ total }}</div></div><div class="stat"><div class="l">Occupied</div><div class="v">{{ occupied }}</div></div><div class="stat"><div class="l">Monthly rent roll</div><div class="v">{{ rent_roll|kes }}</div></div></div>
+{% if rows %}<div class="card flush tablewrap"><table><thead><tr><th>Unit</th><th>Pay to account</th><th>Tenant</th><th class="num">Rent</th><th class="num">Owing</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td><b>{{ r.unit.identifier }}</b><br><span class="muted small">{{ r.unit.unit_type }}</span></td><td class="mono">{{ r.unit.account_number }}</td>
+<td>{% if r.lease %}<a href="{% url 'lease_detail' r.lease.pk %}">{{ r.lease.tenant.full_name }}</a>{% else %}<span class="pill muted">Vacant</span>{% endif %}</td>
+<td class="num">{% if r.lease %}{{ r.lease.rent_minor|kes }}{% else %}{{ r.unit.rent_minor|kes }}{% endif %}</td><td class="num">{% if r.owing %}<b style="color:var(--bad)">{{ r.owing|kes }}</b>{% else %}—{% endif %}</td>
+<td class="num">{% if not r.lease and can_write %}<a class="btn sm" href="{% url 'move_in' %}?unit={{ r.unit.pk }}">Move in</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card empty"><h3>No units yet</h3><p>Add units so tenants can be moved in and given payment account numbers.</p>{% if can_write %}<a class="btn primary" href="{% url 'unit_new' prop.pk %}">Add first unit</a>{% endif %}</div>{% endif %}{% endblock %}

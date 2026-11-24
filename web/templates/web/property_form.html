@@ -1,0 +1,5 @@
+{% extends "web/base.html" %}{% block title %}Add property{% endblock %}
+{% block content %}<div class="crumbs"><a href="{% url 'properties_list' %}">Properties</a> / New</div><div class="pagehead"><h1>Add a property</h1></div>
+<form method="post" class="card formcard"><div class="body">{% csrf_token %}{% if form.non_field_errors %}<div class="formerrors">{{ form.non_field_errors }}</div>{% endif %}
+<div class="formgrid">{% for field in form %}{% include "web/partials/field.html" %}{% endfor %}</div>
+<button class="btn primary" type="submit">Save property</button> <a class="btn" href="{% url 'properties_list' %}">Cancel</a></div></form>{% endblock %}

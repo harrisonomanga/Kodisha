@@ -1,0 +1,4 @@
+{% extends "web/base.html" %}{% block title %}Set up{% endblock %}
+{% block content %}<div class="formcard"><div class="pagehead"><div><h1>Set up your organisation</h1><p>Two minutes. You can change everything later.</p></div></div>
+<form method="post" class="card"><div class="body">{% csrf_token %}{% for field in form %}{% include "web/partials/field.html" %}{% endfor %}
+<button class="btn primary" type="submit">Create organisation</button></div></form></div>{% endblock %}

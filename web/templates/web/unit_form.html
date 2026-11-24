@@ -1,0 +1,6 @@
+{% extends "web/base.html" %}{% block title %}Add unit{% endblock %}
+{% block content %}<div class="crumbs"><a href="{% url 'property_detail' prop.pk %}">{{ prop.name }}</a> / New unit</div><div class="pagehead"><h1>Add a unit</h1></div>
+<form method="post" class="card formcard"><div class="body">{% csrf_token %}{% if form.non_field_errors %}<div class="formerrors">{{ form.non_field_errors }}</div>{% endif %}
+<div class="formgrid">{% for field in form %}{% include "web/partials/field.html" %}{% endfor %}</div>
+<p class="muted small">A payment account number is generated automatically, e.g. <span class="mono">{{ prop.code }}…</span> plus a check character that catches typing mistakes.</p>
+<button class="btn primary" type="submit">Save unit</button> <a class="btn" href="{% url 'property_detail' prop.pk %}">Cancel</a></div></form>{% endblock %}

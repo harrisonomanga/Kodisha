@@ -1,0 +1,2 @@
+{% extends "web/base.html" %}{% block title %}Not allowed{% endblock %}
+{% block content %}<div class="empty card"><h3>You don't have permission to do that</h3><p>Your role can view this but not change it. Ask an owner or manager if you need access.</p><a class="btn" href="{% url 'dashboard' %}">Back to rent board</a></div>{% endblock %}

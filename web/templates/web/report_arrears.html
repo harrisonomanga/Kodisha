@@ -1,0 +1,6 @@
+{% extends "web/base.html" %}{% block title %}Arrears{% endblock %}
+{% block content %}<div class="pagehead"><div><h1>Arrears ageing</h1><p>As of {{ today|date:"j F Y" }}. Total owed: <b>{{ grand|kes }}</b></p></div><div class="actions"><a class="btn" href="{% url 'report_arrears_csv' %}">Download CSV</a><button class="btn" type="button" onclick="window.print()">Print</button></div></div>
+{% if rows %}<div class="card flush tablewrap"><table><thead><tr><th>Tenant</th><th>Unit</th>{% for b in buckets %}<th class="num">{{ b }}</th>{% endfor %}<th class="num">Total</th></tr></thead><tbody>
+{% for r in rows %}<tr><td><a href="{% url 'lease_detail' r.lease_id %}">{{ r.tenant }}</a></td><td>{{ r.property }} · {{ r.unit }}</td>{% for b in buckets %}<td class="num">{% with v=r.buckets|get:b %}{% if v %}{{ v|money }}{% else %}<span class="muted">–</span>{% endif %}{% endwith %}</td>{% endfor %}<td class="num"><b>{{ r.total|money }}</b></td></tr>{% endfor %}
+<tr><td colspan="2"><b>Total</b></td>{% for b in buckets %}<td class="num"><b>{{ totals|get:b|money }}</b></td>{% endfor %}<td class="num"><b>{{ grand|money }}</b></td></tr></tbody></table></div>
+{% else %}<div class="card empty"><h3>No arrears</h3><p>Every tenant is up to date.</p></div>{% endif %}{% endblock %}

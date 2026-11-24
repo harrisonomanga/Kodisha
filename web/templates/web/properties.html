@@ -1,0 +1,6 @@
+{% extends "web/base.html" %}{% block title %}Properties{% endblock %}
+{% block content %}<div class="pagehead"><div><h1>Properties</h1><p>{{ properties|length }} propert{{ properties|length|pluralize:"y,ies" }}</p></div>
+{% if can_write and can_review %}<a class="btn primary" href="{% url 'properties_new' %}">Add property</a>{% endif %}</div>
+{% if properties %}<div class="card flush tablewrap"><table><thead><tr><th>Property</th><th>Landlord</th><th class="num">Units</th><th class="num">Occupied</th><th class="num">Monthly rent roll</th></tr></thead><tbody>
+{% for p in properties %}<tr><td><a href="{% url 'property_detail' p.pk %}"><b>{{ p.name }}</b></a><br><span class="muted small">{{ p.code }}{% if p.location %} · {{ p.location }}{% endif %}</span></td><td>{{ p.landlord.name|default:"—" }}</td><td class="num">{{ p.unit_count }}</td><td class="num">{{ p.occupied }}{% if p.vacant %} <span class="pill muted">{{ p.vacant }} vacant</span>{% endif %}</td><td class="num">{{ p.rent_roll|kes }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card empty"><h3>No properties yet</h3><p>Add a property, then its units, then move tenants in.</p>{% if can_write and can_review %}<a class="btn primary" href="{% url 'properties_new' %}">Add property</a>{% endif %}</div>{% endif %}{% endblock %}

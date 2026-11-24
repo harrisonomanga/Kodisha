@@ -1,0 +1,37 @@
+{% load static %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}{% endblock %} · {{ product_name }}</title>
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="{% static 'web/app.css' %}"></head>
+<body><a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+<aside class="side" id="nav" aria-label="Main">
+  <div class="brand"><i>K</i>{{ product_name }}</div>
+  <nav class="nav">
+    <a href="{% url 'dashboard' %}" class="{% if section == 'home' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Rent board</a>
+    <a href="{% url 'properties_list' %}" class="{% if section == 'properties' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 21v-5h6v5"/></svg>Properties</a>
+    <a href="{% url 'tenants_list' %}" class="{% if section == 'tenants' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M17 5a3.5 3.5 0 0 1 0 6M22 19c0-2.5-1.5-4.5-4-5.5"/></svg>Tenants</a>
+    <a href="{% url 'invoices_list' %}" class="{% if section == 'invoices' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>Invoices</a>
+    <a href="{% url 'payments_list' %}" class="{% if section == 'payments' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Payments</a>
+    {% if can_review %}<a href="{% url 'review_list' %}" class="{% if section == 'review' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>Needs review{% if review_count %}<span class="badge">{{ review_count }}</span>{% endif %}</a>{% endif %}
+    <h4>Reports</h4>
+    <a href="{% url 'report_arrears' %}" class="{% if section == 'reports' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Arrears</a>
+    {% if role == 'owner' %}<h4>Admin</h4><a href="{% url 'settings_page' %}" class="{% if section == 'settings' %}on{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.4 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.4-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.2-.8.2-1.2z"/></svg>Settings</a>{% endif %}
+  </nav>
+  <div class="foot">{{ user.get_full_name|default:user.username }}<br><span class="muted">{{ role_label }}</span>
+    <form method="post" action="{% url 'logout' %}" style="margin-top:6px">{% csrf_token %}<button type="submit">Sign out</button></form></div>
+</aside>
+<div class="scrim"></div>
+<div class="main">
+  <header class="top">
+    <button class="burger" type="button" aria-label="Open menu" aria-controls="nav" aria-expanded="false">☰</button>
+    <form class="search" action="{% url 'search' %}" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Search tenant, unit, M-Pesa code…" aria-label="Search"></form>
+    {% if orgs|length > 1 %}<form class="orgsw" method="post" action="{% url 'switch_org' %}">{% csrf_token %}<select name="org_id" onchange="this.form.submit()" aria-label="Organisation">{% for o in orgs %}<option value="{{ o.pk }}"{% if o.pk == org.pk %} selected{% endif %}>{{ o.name }}</option>{% endfor %}</select></form>
+    {% else %}<span class="muted small orgsw">{{ org.name }}</span>{% endif %}
+  </header>
+  {% if messages %}<div class="msgs" role="status">{% for m in messages %}<div class="msg {{ m.tags }}"><span>{{ m }}</span><button type="button" aria-label="Dismiss">×</button></div>{% endfor %}</div>{% endif %}
+  <main class="content" id="main">{% block content %}{% endblock %}</main>
+</div></div>
+<script src="{% static 'web/app.js' %}"></script>{% block scripts %}{% endblock %}
+</body></html>
